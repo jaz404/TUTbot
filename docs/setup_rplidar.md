@@ -3,7 +3,7 @@
 This guide will walk you through setting up the RPLIDAR C1 sensor for the TUTbot robot.
 
 RPLIDAR C1 uses Time-of-Flight (ToF) and triangulation for distance measurement.
-<div style="text-align: center;">
+<div align="center">
 <img src="assets/rplidar_c1.png" width="300px"/>
 </div>
 

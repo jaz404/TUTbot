@@ -25,7 +25,7 @@ The TUTbot is built using off-the-shelf components and 3D printed parts. The ide
 - wire (26awg for low power and 18awg for high power)
 
 <div align="center">
-<img src="assets/components.jpg" width="500px" style="transform: rotate(270deg);"/>
+<img src="assets/components_rotated.jpg" width="500px"/>
 </div>
 
 > the STL files for the chassis were sourced from AntoBrandi 
