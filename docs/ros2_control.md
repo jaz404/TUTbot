@@ -410,6 +410,8 @@ ros2 topic pub /simple_velocity_controller/commands std_msgs/msg/Float64MultiArr
   data_offset: 0
 data: [1,-1]'
 ```
+<p align="center">
 <img src="assets/ros2_control_test.gif" width="500px"/>
 <br>
 <em>Robot moving forward and then rotating in place</em>
+</p>
