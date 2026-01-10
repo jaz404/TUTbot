@@ -10,6 +10,7 @@ This repository contains the documentation, code, and resources for building and
     - [Wemos D1 Mini Setup](docs/setup_wemos.md)
     - [rplidar C1 Setup](docs/setup_rplidar.md)
 - [Visualization Setup](docs/setup_vis.md)
+- [ROS2 Control Setup](docs/ros2_control.md)
 
 ## Progress Table
 
@@ -19,8 +20,8 @@ This repository contains the documentation, code, and resources for building and
 | ROS setup | In Progress  |
 | Setup PID control for motors | |
 | URDF & Visualization | Done |
-| Control |  |
+| Control | Done |
 | Kinematics |  |
 | Odometry |  |
-| Probability & Sensor Fusion||
+| Probability & Sensor Fusion| |
 | Add all the code | |
