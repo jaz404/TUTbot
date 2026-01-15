@@ -1,10 +1,10 @@
 # TUTbot
 
-<p align="center">
+<div align="center">
 <img src="docs/assets/assembled1.jpg" width="500px" />
 <img src="docs/assets/assembled2.jpg" width="500px" />
 <em>Assembled TUTbot</em>
-</p>
+</div>
 
 *TUTbot* or short for tutorial robot is a mobile robot that I am building to advance my understanding of robotic teleoperation, autonomous navigation, perception and simulation.
 
