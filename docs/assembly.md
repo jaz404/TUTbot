@@ -9,20 +9,23 @@ This is a walkthrough on how I designed and assembled the TUTbot robot.
 The TUTbot is built using off-the-shelf components and 3D printed parts. The idea is to keep it simple and modular for easy upgrades. 
 
 ## Components List
-- Chassis plates (base, middle and top) (1x each)
-- Geared Motor with Quadrature Encoder and Mounting Bracket (2x)
-- Wheels (2x)
-- Raspberry pi 5 (with active cooling and case) (1x)
-- rplidar C1 (1x)
-- MPU6050 IMU (1x)
-- LIPO 3S Battery pack (7.4V) - I am using a 5V 10A switching mode power supply and a power bank instead 
-- Wemos d1 mini (for motor control and encoder reading)
-- L298N motor driver (1x)
-- 1.25" castor wheel (1x)
-- prototyping components (perfboard, breadboard, terminal block, jumper wires)
-- standoffs m3 (various lengths)
-- screws and nuts (M2, M3, M4, various lengths)
-- wire (26awg for low power and 18awg for high power)
+
+| Component | Quantity | Notes |
+|-----------|----------|-------|
+| Chassis plates (base, middle and top) | 1x each | 3D printed structural frame |
+| Geared Motor with Quadrature Encoder and Mounting Bracket | 2x | Main drive motors |
+| Wheels | 2x | Compatible with geared motors |
+| Raspberry pi 5 (with active cooling and case) | 1x | Main compute unit |
+| rplidar C1 | 1x | 360° LiDAR sensor |
+| MPU6050 IMU | 1x | 6-axis IMU sensor |
+| LIPO 3S Battery pack (7.4V) | 1x | Power source (using 5V 10A PSU + power bank instead) |
+| Wemos d1 mini | 1x | Motor control and encoder reading |
+| L298N motor driver | 1x | Motor controller |
+| 1.25" castor wheel | 1x | Front support wheel |
+| Prototyping components | - | Perfboard, breadboard, terminal block, jumper wires |
+| Standoffs M3 | Various lengths | For component mounting |
+| Screws and nuts (M2, M3, M4) | Various lengths | Fasteners |
+| Wire | - | 26AWG (low power) and 18AWG (high power) |
 
 <div align="center">
 <img src="assets/components_rotated.jpg" width="500px"/>
