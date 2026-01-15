@@ -1,8 +1,8 @@
 # TUTbot
 
 <div align="center">
-<img src="docs/assets/assembled1.jpg" width="500px" />
-<img src="docs/assets/assembled2.jpg" width="500px" />
+<img src="docs/assets/assembled1.jpg" width="400px" />
+<img src="docs/assets/assembled2.jpg" width="400px" />
 <em>Assembled TUTbot</em>
 </div>
 
