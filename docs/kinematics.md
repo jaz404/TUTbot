@@ -1,6 +1,9 @@
 # Kinematics
 
-We can describe the pose of our mobile robot with respect to the global/world frame using 3 parameters: x, y, and theta. 
+Mobile robot kinematics describes how robots move through space. For a differential drive robot moving on a 2D plane, we can describe its pose (position and orientation) with respect to the global/world frame using 3 parameters: x, y, and θ (theta).
+
+- **x, y**: Cartesian coordinates representing the robot's position in the world frame
+- **θ (theta)**: Orientation angle representing the robot's rotation about the z-axis
 
 ## Turtlesim Example
 
