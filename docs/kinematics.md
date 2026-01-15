@@ -108,3 +108,54 @@ To now control turtle2 using teleop:
 ```bash
 ros2 run turtlesim turtle_teleop_key --ros-args --remap turtle1/cmd_vel:=turtle2/cmd_vel
 ```
+### Translation Vector and Rotation Matrix 
+
+The pose topics `turtle1/pose` and `turtle2/pose` provide the position and orientation of each turtle with respect to the global frame (the bottom left corner of the turtlesim window).
+
+#### Translation Vector
+The translation vector from turtle1 to turtle2 represents the position of turtle2 expressed in turtle1's coordinate frame:
+
+$$\mathbf{t}_{2}^{1} = \begin{bmatrix} T_x \\ T_y \end{bmatrix} = \begin{bmatrix} x_2 - x_1 \\ y_2 - y_1 \end{bmatrix}$$
+
+#### Rotation Matrix
+The rotation matrix defines the orientation of turtle2 with respect to turtle1:
+
+$$
+R_{2}^{1} = \begin{bmatrix} 
+\cos\theta_{2}^{1} & -\sin\theta_{2}^{1} \\ 
+\sin\theta_{2}^{1} & \cos\theta_{2}^{1} 
+\end{bmatrix}
+$$
+
+where $\theta_{2}^{1} = \theta_2 - \theta_1$ is the relative orientation.
+
+#### Homogeneous Transformation
+The complete transformation from turtle1 to turtle2 combines both rotation and translation into a single homogeneous transformation matrix:
+
+$$
+T_{2}^{1} = \begin{bmatrix} 
+R_{2}^{1} & \mathbf{t}_{2}^{1} \\ 
+0_{1\times2} & 1
+\end{bmatrix} = \begin{bmatrix} 
+\cos\theta_{2}^{1} & -\sin\theta_{2}^{1} & T_x \\ 
+\sin\theta_{2}^{1} & \cos\theta_{2}^{1} & T_y \\ 
+0 & 0 & 1
+\end{bmatrix}
+$$
+
+#### Implementation
+A practical implementation is provided in [simple_turtlesim_kinematics.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_turtlesim_kinematics.py). To use it:
+
+1. Spawn two turtles using the methods described above
+2. Run the kinematics node:
+```bash
+ros2 run bumperbot_py_examples simple_turtlesim_kinematics
+```
+
+<p align="center">
+  <img src="assets/t1_2.png" alt="Turtle Kinematics">
+  <br>
+  <em>Translation vector and rotation matrix from turtle1 to turtle2 </em>
+</p>
+
+# Differential Kinematics 
