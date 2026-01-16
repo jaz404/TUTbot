@@ -15,7 +15,6 @@ In another window, launch turtle teleoperation:
 ```bash
 ros2 run turtlesim turtle_teleop_key
 ```
-<!-- insert a gif here -->
 <p align="center">
   <img src="assets/turtlesim_teleop.gif" alt="Turtle Teleop">
   <br>
@@ -329,30 +328,31 @@ $$
 \dot{\theta}
 \end{bmatrix}
 =
+\left(
 \begin{bmatrix}
 \cos\theta & -\sin\theta & 0 \\
 \sin\theta & \cos\theta  & 0 \\
 0          & 0           & 1
 \end{bmatrix}
+\right)
+\left(
 \begin{bmatrix}
-\frac{r}{2} & \frac{r}{2} \\
-0           & 0 \\
-\frac{r}{l} & -\frac{r}{l}
+\frac{r}{2} & \frac{r}{2} & 0 \\
+0           & 0         & 0 \\
+\frac{r}{l} & -\frac{r}{l} & 0
 \end{bmatrix}
+\right)
+\left(
 \begin{bmatrix}
 \dot{\phi}_R \\
-\dot{\phi}_L
+\dot{\phi}_L \\
+0
 \end{bmatrix}
+\right)
 $$
 
 $$
-\begin{bmatrix}
-\dot{x} \\
-\dot{y} \\
-\dot{\theta}
-\end{bmatrix}
-=
-f(r, l, \theta, \dot{\phi}_R, \dot{\phi}_L)
+\mathbf{\dot{\mathbf{p}}} = f(r, l, \theta, \dot{\phi}_R, \dot{\phi}_L)
 $$
 
 On simplifying the kinematic expression, we obtain the **Jacobian matrix** that maps wheel angular velocities to world-frame pose rates:
@@ -364,17 +364,18 @@ $$
 \dot{\theta}
 \end{bmatrix}
 =
-\underbrace{
+\left(
 \begin{bmatrix}
 \frac{r}{2}\cos\theta & \frac{r}{2}\cos\theta \\
 \frac{r}{2}\sin\theta & \frac{r}{2}\sin\theta \\
-\frac{r}{l}           & -\frac{r}{l}
+\frac{r}{l} & -\frac{r}{l}
 \end{bmatrix}
-}_{J(\theta)}
+\right)
 \begin{bmatrix}
 \dot{\phi}_R \\
 \dot{\phi}_L
-\end{bmatrix} \tag{3}
+\end{bmatrix}
+\tag{3}
 $$
 
 ## Simple Speed Controller [[simple_controller.py]](../src/bumperbot_controller/bumperbot_controller/simple_controller.py)
@@ -478,3 +479,25 @@ ros2 topic pub /bumperbot_controller/cmd_vel geometry_msgs/msg/TwistStamped \ "{
 <em>Simple controller demo</em>
 </p>
 
+### Using turtlesim teleop with simple controller
+
+Turtlesim teleop publishes messages to `turtle1/cmd_vel`. We can remap the topic to `/bumperbot_controller/cmd_vel` to use it with the simple controller. The teleop uses the `geometry_msgs/msg/Twist` format and not `geometry_msgs/msg/TwistStamped`, so we need to modify the simple controller to accept `geometry_msgs/msg/Twist`.
+
+**Changes needed in `simple_controller.py`:**
+
+- **Line 23**: Change `TwistStamped` to `Twist`
+  ```python
+  self.vel_sub_ = self.create_subscription(Twist, "bumperbot_controller/cmd_vel", self.vel_callback, 10)
+  ```
+
+- **Lines 31-32**: Switch `msg.twist` to `msg`
+  ```python
+  robot_speed = np.array([[msg.linear.x], 
+  [msg.angular.z]])
+  ```
+
+<p align="center">
+  <img src="assets/control_teleop.gif" alt="Turtle Teleop">
+  <br>
+  <em>Teleop with simple controller.</em>
+</p>
