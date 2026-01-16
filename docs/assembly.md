@@ -16,7 +16,7 @@ The TUTbot is built using off-the-shelf components and 3D printed parts. The ide
 | Geared Motor with Quadrature Encoder and Mounting Bracket | 2x | Main drive motors |
 | Wheels | 2x | Compatible with geared motors |
 | Raspberry pi 5 (with active cooling and case) | 1x | Main compute unit |
-| rplidar C1 | 1x | 360° LiDAR sensor |
+| rplidar C1 | 1x | 360° 2D LiDAR sensor |
 | MPU6050 IMU | 1x | 6-axis IMU sensor |
 | LIPO 3S Battery pack (7.4V) | 1x | Power source (using 5V 10A PSU + power bank instead) |
 | Wemos d1 mini | 1x | Motor control and encoder reading |

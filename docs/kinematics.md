@@ -162,3 +162,319 @@ ros2 run bumperbot_py_examples simple_turtlesim_kinematics
 </p>
 
 # Differential Kinematics 
+
+### Robot Pose
+The robot pose in the world frame is
+
+$$
+\mathbf{p} =
+\begin{bmatrix}
+x \\
+y \\
+\theta
+\end{bmatrix}
+$$
+
+with time derivative
+
+$$
+\dot{\mathbf{p}} =
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+$$
+
+### Wheel Parameters
+
+- $r$ : wheel radius  
+- $l$ : distance between left and right wheels (wheelbase)  
+- $\dot{\phi}_R$ : right wheel angular velocity  
+- $\dot{\phi}_L$ : left wheel angular velocity  
+
+### Compact Function Form
+
+$$
+\dot{\mathbf{p}} = f(l, r, \theta, \dot{\phi}_R, \dot{\phi}_L)
+$$
+This is what we need to calculate to be able to send velocity commands to the robot.
+
+### Body-Frame Velocities
+
+Linear and angular velocities of the robot body:
+
+$$
+v = \frac{r}{2}(\dot{\phi}_R + \dot{\phi}_L)
+$$
+
+$$
+\omega = \frac{r}{l}(\dot{\phi}_R - \dot{\phi}_L)
+$$
+
+
+### Differential Drive Velocity Mapping
+
+The mapping from wheel velocities to body velocities is
+
+$$
+\mathbf{u}
+=
+\begin{bmatrix}
+\frac{r}{2} & \frac{r}{2} \\
+\frac{r}{l} & -\frac{r}{l}
+\end{bmatrix}
+\dot{\boldsymbol{\phi}}
+$$
+
+or explicitly,
+
+$$
+\begin{bmatrix}
+v \\
+\omega
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{r}{2} & \frac{r}{2} \\
+\frac{r}{l} & -\frac{r}{l}
+\end{bmatrix}
+\begin{bmatrix}
+\dot{\phi}_R \\
+\dot{\phi}_L
+\end{bmatrix}
+$$
+On the left side we have the robot body velocities and on the right side we have the wheel velocities. 
+
+This matrix is often referred to as the **kinematic coupling matrix** for a differential-drive robot.
+
+We can also map it the other way around:
+
+$$
+\begin{bmatrix}
+\dot{\phi}_R \\
+\dot{\phi}_L
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{1}{r} & \frac{l}{2r} \\
+\frac{1}{r} & -\frac{l}{2r}
+\end{bmatrix}
+\begin{bmatrix}
+v \\
+\omega
+\end{bmatrix} \tag{1}
+$$
+
+### Body-to-World Velocity Transformation
+
+Connects the velocity of robot in body frame to the velocity of robot in world 
+
+The robot body-frame velocity vector is
+
+$$
+\mathbf{u} =
+\begin{bmatrix}
+v \\
+\omega
+\end{bmatrix}
+$$
+
+The world-frame pose rate is given by
+
+$$
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta  & 0 \\
+0          & 0           & 1
+\end{bmatrix}
+\begin{bmatrix}
+v \\
+0 \\
+\omega
+\end{bmatrix} \tag{2}
+$$
+
+or equivalently,
+
+$$
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+\begin{bmatrix}
+v\cos\theta \\
+v\sin\theta \\
+\omega
+\end{bmatrix}
+$$
+    The body-frame velocity of a differential-drive robot consists of forward motion \(v\) and angular motion \(\omega\). The lateral velocity component is zero due to the nonholonomic (no side-slip) constraint of the wheels. The rotation matrix transforms these body-frame velocities into world-frame pose rates.
+
+Using equations (1) and (2), we can calculate the equation which connects the overall velocity of the robot in the world frame to the rotation velocity of the wheels. This is called the **forward differential kinematics**.
+
+On multiplying (1) and (2), we get: 
+
+$$
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta  & 0 \\
+0          & 0           & 1
+\end{bmatrix}
+\begin{bmatrix}
+\frac{r}{2} & \frac{r}{2} \\
+0           & 0 \\
+\frac{r}{l} & -\frac{r}{l}
+\end{bmatrix}
+\begin{bmatrix}
+\dot{\phi}_R \\
+\dot{\phi}_L
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+f(r, l, \theta, \dot{\phi}_R, \dot{\phi}_L)
+$$
+
+On simplifying the kinematic expression, we obtain the **Jacobian matrix** that maps wheel angular velocities to world-frame pose rates:
+
+$$
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\frac{r}{2}\cos\theta & \frac{r}{2}\cos\theta \\
+\frac{r}{2}\sin\theta & \frac{r}{2}\sin\theta \\
+\frac{r}{l}           & -\frac{r}{l}
+\end{bmatrix}
+}_{J(\theta)}
+\begin{bmatrix}
+\dot{\phi}_R \\
+\dot{\phi}_L
+\end{bmatrix} \tag{3}
+$$
+
+## Simple Speed Controller [[simple_controller.py]](../src/bumperbot_controller/bumperbot_controller/simple_controller.py)
+
+Now, we have all the pre-requisites to implement the simple speed controller. 
+
+Create a new file called [simple_controller.py](../src/bumperbot_controller/bumperbot_controller/simple_controller.py) in the `bumperbot_controller` package. 
+
+In the class, we can define wheel radius and wheel separation as parameters and declare them using the `declare_parameter` method. 
+```python
+self.declare_parameter('wheel_radius', 0.033)
+self.declare_parameter('wheel_separation', 0.17)
+```
+We will publish the wheel speeds to the topic `simple_velocity_controller/commands` and subscribe to the topic `bumperbot_controller/cmd_vel`. In the callback to subscription, we will calculate the wheel speeds using the kinematic expression (3) we calculated above and publish them to the topic `simple_velocity_controller/commands`.
+
+```python
+self.speed_conversion_ = np.array([[self.wheel_radius_/2, self.wheel_radius_/2],
+                                           [self.wheel_radius_/self.wheel_separation_, -self.wheel_radius_/self.wheel_separation_]])
+```
+Next, we can modify the [controller.launch.py](../src/bumperbot_controller/launch/controller.launch.py) file to pass the parameters to the controller node. 
+```python
+    wheel_radius_arg = DeclareLaunchArgument(
+        "wheel_radius",
+        default_value="0.033",
+    )
+    wheel_separation_arg = DeclareLaunchArgument(
+        "wheel_separation",
+        default_value="0.17",
+    )
+```
+For more details, refer to the [bumpberbot_controller](../src/bumperbot_controller) package.
+
+The `--show-args` flag can be used to see the arguments that can be passed to the launch file. These can be passed as arguments to the launch file.
+
+```bash
+ros2 launch bumperbot_controller controller.launch.py --show-args
+```
+Output: 
+```bash
+Arguments (pass arguments as '<name>:=<value>'):
+
+    'use_python':
+        Use Python for controller manager
+        (default: 'true')
+
+    'wheel_radius':
+        Wheel radius
+        (default: '0.033')
+
+    'wheel_separation':
+        Wheel separation
+        (default: '0.17')
+```
+
+We should see the topic `/bumperbot_controller/cmd_vel` topic after running the controller launch file and their should be correct setup messages displayed in the terminal for gazebo and simple_controller. 
+
+Run gazebo `ros2 launch bumperbot_gazebo bumperbot.launch.py` and controller `ros2 launch bumperbot_controller controller.launch.py`.
+GZ terminal should display something for both simple_velocity_controller and joint_state_broadcaster which we defined in the [bumperbot_controllers.yaml](../src/bumperbot_controller/bumperbot_controller/config/bumperbot_controllers.yaml) file. 
+```bash
+ros_test_ws/install/bumperbot_controller/share/bumperbot_controller/config/bumperbot_controllers.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gazebo-2] [INFO] [1768547892.862081686] [controller_manager]: Configuring controller: 'simple_velocity_controller'
+[gazebo-2] [INFO] [1768547892.863846881] [simple_velocity_controller]: configure successful
+[gazebo-2] [INFO] [1768547892.947776603] [controller_manager]: Activating controllers: [ simple_velocity_controller ]
+[gazebo-2] [INFO] [1768547892.948426164] [simple_velocity_controller]: activate successful
+[gazebo-2] [INFO] [1768547892.948521374] [controller_manager]: Successfully switched controllers!
+[gazebo-2] [INFO] [1768547893.168249378] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[gazebo-2] [INFO] [1768547893.168382290] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[gazebo-2] [INFO] [1768547893.180661910] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /home/jaspr/Documents/TUTbot/ros_test_ws/install/bumperbot_controller/share/bumperbot_controller/config/bumperbot_controllers.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gazebo-2] [INFO] [1768547893.248758345] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[gazebo-2] [INFO] [1768547893.248936954] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[gazebo-2] [INFO] [1768547893.273773149] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[gazebo-2] [INFO] [1768547893.281656138] [controller_manager]: Successfully switched controllers!
+```
+Simple controller terminal should display something like this:
+```bash
+[INFO] [simple_controller.py-3]: process started with pid [73093]
+[simple_controller.py-3] [INFO] [1768547892.366700139] [simple_controller]:  Using wheel radius: 0.033
+[simple_controller.py-3] [INFO] [1768547892.367461813] [simple_controller]:  Using wheel separation: 0.17
+[simple_controller.py-3] [INFO] [1768547892.375316157] [simple_controller]:  The speed conversion matrix is: [[ 0.0165      0.0165    ]
+[simple_controller.py-3]  [ 0.19411765 -0.19411765]]
+[spawner-2] [INFO] [1768547892.860621409] [spawner_simple_velocity_controller]: Loaded simple_velocity_controller
+[spawner-2] [INFO] [1768547892.960000779] [spawner_simple_velocity_controller]: Configured and activated simple_velocity_controller
+[INFO] [spawner-2]: process has finished cleanly [pid 73092]
+[spawner-1] [INFO] [1768547893.247381777] [spawner_joint_state_broadcaster]: Loaded joint_state_broadcaster
+[spawner-1] [INFO] [1768547893.293466639] [spawner_joint_state_broadcaster]: Configured and activated joint_state_broadcaster
+[INFO] [spawner-1]: process has finished cleanly [pid 73091]
+```
+
+Next, to actually move the robot, we can publish to `/bumperbot_controller/cmd_vel` topic. 
+> Sometimes the tab completion doesn't work directly to get the message template. Just paste the yaml in the terminal with a \\. 
+```bash
+ros2 topic pub /bumperbot_controller/cmd_vel geometry_msgs/msg/TwistStamped \ "{header: {stamp: {sec: 0, nanosec: 0}, frame_id: ''},
+  twist: {linear: {x: 0.0, y: 0.0, z: 0.0},
+          angular: {x: 0.0, y: 0.0, z: 0.5}}}"
+```
+
+<!-- include gif -->
+<p align="center">
+<img src="assets/diff_kinematics.gif" />
+<br>
+<em>Simple controller demo</em>
+</p>
+
