@@ -10,9 +10,14 @@
 
 This repository contains the documentation, code, and resources for building and programming the TUTbot robot.
 
+
+<div align="center">
+
 ![ROS2](https://img.shields.io/badge/ROS2-Jazzy-blue)
 ![Python](https://img.shields.io/badge/Python-3.10+-green)
 ![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-5-blue)
+
+</div>
 
 ## Index
 - [Assembly Guide](docs/assembly.md)
