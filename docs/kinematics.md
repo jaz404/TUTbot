@@ -217,13 +217,13 @@ $$
 The mapping from wheel velocities to body velocities is
 
 $$
-\mathbf{u}
+u
 =
 \begin{bmatrix}
 \frac{r}{2} & \frac{r}{2} \\
 \frac{r}{l} & -\frac{r}{l}
 \end{bmatrix}
-\dot{\boldsymbol{\phi}}
+\dot{\phi}
 $$
 
 or explicitly,
@@ -497,7 +497,5 @@ Turtlesim teleop publishes messages to `turtle1/cmd_vel`. We can remap the topic
   ```
 
 <p align="center">
-  <img src="assets/control_teleop.gif" alt="Turtle Teleop">
-  <br>
-  <em>Teleop with simple controller.</em>
+  <img src="assets/control_teleop.gif" alt="Turtle Teleop"  <em>Teleop with simple controller.</em>ler.</em>
 </p>
