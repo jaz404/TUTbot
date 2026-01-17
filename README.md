@@ -37,7 +37,7 @@ This repository contains the documentation, code, and resources for building and
 | Setup PID control for motors | |
 | URDF & Visualization | Done |
 | Control | Done |
-| Kinematics | In Progress |
+| Kinematics | Done |
 | Odometry | |
 | Probability & Sensor Fusion| |
 | Add all the code | |

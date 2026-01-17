@@ -501,3 +501,52 @@ Turtlesim teleop publishes messages to `turtle1/cmd_vel`. We can remap the topic
   <br>
   <em>Teleop with simple controller.</em>
 </p>
+
+## Using joystick teleop with simple controller
+
+We can use the joystick teleop to control the robot. We can use the `joy_teleop` package to do this. 
+
+<p align="center">
+  <img src="assets/teleop_ps4.gif" alt="Joystick Teleop" />
+  <br>
+  <em>Teleop with joystick.</em>
+</p>
+
+Implementation details are in the [joystick_teleop.launch.py](../src/bumperbot_controller/launch/joystick_teleop.launch.py) file. This file launches the joy_node from the `joy` package and the joy_teleop node from the `joy_teleop` package.
+```python
+joy_node = Node(
+        package="joy",
+        executable="joy_node",
+        name="joystick",
+        parameters=[os.path.join(get_package_share_directory("bumperbot_controller"), "config", "joystick_config.yaml")]
+    )
+joy_teleop = Node(
+        package="joy_teleop",
+        executable="joy_teleop",
+        parameters=[os.path.join(get_package_share_directory("bumperbot_controller"), "config", "joystick_teleop.yaml")]
+    )
+```
+#### joy package
+The joy package provides a low-level interface between a physical joystick and ROS 2. Its joy_node reads raw input events from a joystick device exposed by the operating system (typically via /dev/input/js* on Linux) and publishes them as messages of type `sensor_msgs/msg/Joy`. These messages contain an array of axis values(analog sticks and triggers) and an array of button states(pressed or not pressed).
+
+The [joystick_config.yaml](../src/bumperbot_controller/config/joystick_config.yaml) file configures parameters for the joy_node. The parameters are:
+- `device_id`: The ID of the joystick device. This is typically 0 for the first joystick.
+- `device_name`: The name of the joystick device. This is typically empty.
+- `deadzone`: The deadzone of the joystick. This is the range of values where the joystick is considered to be at rest.
+- `autorepeat_rate`: The autorepeat rate of the joystick. This is the rate at which the joystick is repeated when held down.
+- `sticky_buttons`: This is whether to use sticky buttons or not.
+- `coalesce_interval_ms`: This is the interval at which the joystick is coalesced.
+
+
+#### joy_teleop package
+The joy_teleop package operates at a higher semantic level. It subscribes to the `sensor_msgs/msg/Joy` messages published by the joy_node and maps joystick inputs to robot commands based on a user-defined configuration. 
+
+The [joystick_teleop.yaml](../src/bumperbot_controller/config/joystick_teleop.yaml) file configures parameters for the joy_teleop node. The parameters are:
+- `move`: This is the move configuration. It has the following parameters:
+  - `type`: The type of the move configuration. This is typically `topic`.
+  - `interface_type`: The interface type of the move configuration. This is typically `geometry_msgs/msg/TwistStamped`.
+  - `topic_name`: The topic name of the move configuration. This is typically `/bumperbot_controller/cmd_vel`.
+  - `deadman_buttons`: The deadman buttons of the move configuration. If this button is not pressed, the robot will not move as a safety measure. 
+  - `axis_mappings`: The axis mappings of the move configuration. This maps the joystick axis to the robot's linear and angular velocity. 
+
+The button and axis mapping can be found at https://github.com/Ar-Ray-code/ps_ros2_common. 
