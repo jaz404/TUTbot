@@ -550,3 +550,110 @@ The [joystick_teleop.yaml](../src/bumperbot_controller/config/joystick_teleop.ya
   - `axis_mappings`: The axis mappings of the move configuration. This maps the joystick axis to the robot's linear and angular velocity. 
 
 The button and axis mapping can be found at https://github.com/Ar-Ray-code/ps_ros2_common. 
+
+# TF2 
+In ROS 2, **TF2** is used to keep track of multiple coordinate frames over time and to transform data between them. Transformations can be classified as **static** or **dynamic** based on whether they change with time.
+
+## Static and Dynamic Transformations
+Static transformations represent fixed, time-invariant relationships between coordinate frames. They are used for rigid connections such as sensor mounting offsets or fixed joints. Static transforms are published once on `/tf_static` and remain constant for the lifetime of the system, making them efficient and deterministic.
+
+Dynamic transformations represent time-varying relationships between frames. They are used for robot motion, joint movement, and localization updates (e.g., odom → base_link). Dynamic transforms are continuously published on `/tf`, include timestamps, and allow TF2 to track how frames move relative to each other over time.
+
+The information published in the `/tf` and `/tf_static` topics is used by other applications such as RViz to visualize the robot's state. 
+
+### Lets create a simple static transform publisher
+Example [simple_tf_kinematics.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_tf_kinematics.py)
+
+We make use of the StaticTransformBroadcaster from the tf2_ros package to broadcast static transforms. 
+This code creates and broadcasts a static transform from `bumperbot_base` to `bumperbot_top` frames:
+
+- **Transform Setup**: Creates a `StaticTransformBroadcaster` and `TransformStamped` message
+- **Frame Definition**: 
+  - Parent frame: `bumperbot_base`
+  - Child frame: `bumperbot_top`
+- **Translation**: Positions top frame 0.3m above base frame (z-axis)
+- **Rotation**: Identity quaternion (no rotation between frames)
+- **Broadcast**: Sends the static transform to TF2 system
+
+```bash
+        self.static_tf_broadcaster_ = StaticTransformBroadcaster(self)
+        # it accepts a TransformStamped message 
+        self.static_transform_stamped_ = TransformStamped()
+        self.static_transform_stamped_.header.stamp = self.get_clock().now().to_msg()
+        self.static_transform_stamped_.header.frame_id = "bumperbot_base"
+        self.static_transform_stamped_.child_frame_id = "bumperbot_top"
+
+        # Defining the transformation from base to top frame
+        # (i) making the bumperbot top frame 0.3m above the base frame
+        self.static_transform_stamped_.transform.translation.x = 0.0
+        self.static_transform_stamped_.transform.translation.y = 0.0
+        self.static_transform_stamped_.transform.translation.z = 0.3
+        # (ii) defining the rotation
+        self.static_transform_stamped_.transform.rotation.x = 0.0
+        self.static_transform_stamped_.transform.rotation.y = 0.0
+        self.static_transform_stamped_.transform.rotation.z = 0.0
+        self.static_transform_stamped_.transform.rotation.w = 1.0
+
+        self.static_tf_broadcaster_.sendTransform(self.static_transform_stamped_)
+```
+Run the node:
+```bash
+ros2 run bumperbot_py_examples simple_tf_kinematics 
+[INFO] [1768705266.941344186] [simple_tf_kinematics]: Publishing static transform between bumperbot_base and bumperbot_top frames
+```
+Reading from the /tf_static topic
+```bash
+ros2 topic echo /tf_static
+transforms:
+- header:
+    stamp:
+      sec: 1768705266
+      nanosec: 923695020
+    frame_id: bumperbot_base
+  child_frame_id: bumperbot_top
+  transform:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.3
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+---
+```
+This can also be visualized in RViz:
+> Make sure to have TF2 added in RViz and set the fixed frame to `bumperbot_base`
+<p align="center">
+  <img src="assets/tf2_static.png" alt="TF Static" />
+  <br>
+  <em>TF Static visualization in RViz.</em>
+</p>
+
+### Lets create a simple dynamic transform publisher
+Example [simple_tf_kinematics.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_tf_kinematics.py)
+
+We will define a fixed frame `odom` and a moving frame `bumperbot_base`. The `bumperbot_top` frame will be a child of the `bumperbot_base` frame. The `bumperbot_base` frame will move linearly in the x-direction at a rate of 0.01 m/s. 
+
+For this, we will use the `TransformBroadcaster` from the tf2_ros package. It is configured in a similar fashion. 
+```python
+self.dynamic_tf_broadcaster_ = TransformBroadcaster(self)
+self.dynamic_transform_stamped_ = TransformStamped()
+```
+We will need helpers that are actually updating the position of the `bumperbot_base` frame. 
+```python
+# helpers for dynamic transforms [this is only for demo to make the transform move linearly in x-direction]
+self.x_increment_ = 0.01
+self.last_x_ = 0.0
+```
+Next, we will need to update the transform at a regular interval. We will use a timer for this. 
+```python
+self.timer_ = self.create_timer(0.1, self.timer_callback) # We will be updating the dynamic transform at 10 Hz
+```
+In the callback function, we can define the rotation and translation of the `bumperbot_base` frame with respect to the `odom` frame. 
+<p align="center">
+  <img src="assets/tf2_dynamic.gif" alt="TF Dynamic" />
+  <br>
+  <em>TF Dynamic visualization in RViz.</em>
+</p>
