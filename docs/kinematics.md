@@ -657,3 +657,146 @@ In the callback function, we can define the rotation and translation of the `bum
   <br>
   <em>TF Dynamic visualization in RViz.</em>
 </p>
+
+## Euler to Quaternion 
+Now, lets make the frames rotate as well along with translating. I created another file [simple_tf_kinematics_2.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_tf_kinematics_2.py). 
+
+To perform operations with quaternions, we will use the `tf_transformations` package. 
+
+Helper variables to keep track:
+```python
+self.rotations_counter_ = 0
+self.last_orientation_ = quaternion_from_euler(0.0, 0.0, 0.0)
+self.orientation_increment_ =  quaternion_from_euler(0.0, 0.0, 0.05) # yaw will increment whenever the timer expires
+```
+Update the rotation logic to use the quaternion:
+```python
+q = quaternion_multiply(self.last_orientation_, self.orientation_increment_)
+
+self.dynamic_transform_stamped_.transform.rotation.x = q[0]
+self.dynamic_transform_stamped_.transform.rotation.y = q[1]
+self.dynamic_transform_stamped_.transform.rotation.z = q[2]
+self.dynamic_transform_stamped_.transform.rotation.w = q[3]
+```
+Increment the rotation counter and update the last orientation:
+```python
+self.rotations_counter_ += 1
+self.last_orientation_ = q
+```
+We can also add logic to reverse the rotation after a certain number of rotations:
+```python
+if self.rotations_counter_ >= 100:
+    self.orientation_increment_ = quaternion_inverse(self.orientation_increment_)
+    self.rotations_counter_ = 0
+```
+<p align="center">
+  <img src="assets/tf2_dynamic_2.gif" alt="TF Dynamic" />
+  <br>
+  <em>TF Dynamic visualization in RViz (translation+rotation).</em>
+</p>
+
+## Implementation of a TF2 Listener [simple_tf_kinematics_2.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_tf_kinematics_2.py)
+
+Create a new service `GetTransform.srv` in the [bumperbot_msgs](../src/bumperbot_msgs/bumperbot_msgs/srv/GetTransform.srv) package. 
+
+```bash
+# Request 
+string frame_id
+string child_frame_id
+---
+# Response
+geometry_msgs/TransformStamped transform
+bool success
+```
+> Here the success is to indicate if the service was able to find the transform between the frames. 
+
+In the [simple_tf_kinematics_2.py](../src/bumperbot_py_examples/bumperbot_py_examples/simple_tf_kinematics_2.py) node, 
+1. We will create `get_transform` service server 
+```python
+self.get_transform_srv_ = self.create_service(GetTransform, "get_transform", self.get_transform_callback)
+```
+This uses the GetTransform service message which we setup above. The callback is set to `get_transform_callback`, which we will setup in the next step.
+
+2. We will create a listener using the `TransformListener` from the tf2_ros package which will be initialized with a `Buffer`. 
+```python
+self.tf_buffer_ = Buffer()
+self.tf_listener_ = TransformListener(self.tf_buffer_, self)
+```
+
+3. In the callback function, we will use the `lookup_transform` function to get the transform between the frames. 
+```python 
+requested_transform = self.tf_buffer_.lookup_transform(request.frame_id, request.child_frame_id, rclpy.time.Time())
+```
+This will return a `TransformStamped` message which contains the transform between the frames. We will set the response to this message and return it. Also all of this will be enclosed within try and except block to set the value of success. 
+
+Usage: \
+Run the service:
+```bash
+ros2 run bumperbot_py_examples simple_tf_kinematics_2
+```
+Call the service:
+```bash
+ros2 service call /get_transform bumperbot_msgs/srv/GetTransform "frame_id: 'odom'
+child_frame_id: 'bumperbot_base'"
+```
+
+## tf2 tools and utilities
+### tf2_tools view_frames
+```bash
+ros2 run tf2_tools view_frames
+```
+This will listen and generate a graph of the frames in the TF2 tree and save it as a pdf.
+```
+[INFO] [1768810726.375039865] [view_frames]: Listening to tf data for 5.0 seconds...
+[INFO] [1768810731.467791297] [view_frames]: Generating graph...
+[INFO] [1768810731.471553975] [view_frames]: Result:tf2_msgs.srv.FrameGraph_Response(frame_yaml="bumperbot_top: \n  parent: 'bumperbot_base'\n  broadcaster: 'default_authority'\n  rate: 10000.000\n  most_recent_transform: 0.000000\n  oldest_transform: 0.000000\n  buffer_length: 0.000\nbumperbot_base: \n  parent: 'odom'\n  broadcaster: 'default_authority'\n  rate: 11.252\n  most_recent_transform: 1768810731.465523\n  oldest_transform: 1768810730.665635\n  buffer_length: 0.800\n")
+[INFO] [1768810731.475528442] [view_frames]: Exporting graph in frames_2026-01-19_01.18.51.pdf file...
+```
+<p align="center">
+  <img src="assets/tf2_tools_view_frames.png" alt="TF2 View Frames" />
+  <br>
+  <em>TF2 View Frames Utility.</em>
+</p>
+
+### tf2_ros tf2_echo
+With this utility, we can get the transform between two frames.
+#### between bumperbot_base and bumperbot_top
+```bash
+ros2 run tf2_ros tf2_echo bumperbot_base bumperbot_top
+```
+```
+[INFO] [1768810995.124872471] [tf2_echo]: Waiting for transform bumperbot_base ->  bumperbot_top: Invalid frame ID "bumperbot_base" passed to canTransform argument target_frame - frame does not exist
+At time 0.0
+- Translation: [0.000, 0.000, 0.300]
+- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.000, 1.000]
+- Rotation: in RPY (radian) [0.000, -0.000, 0.000]
+- Rotation: in RPY (degree) [0.000, -0.000, 0.000]
+- Matrix:
+  1.000  0.000  0.000  0.000
+  0.000  1.000  0.000  0.000
+  0.000  0.000  1.000  0.300
+  0.000  0.000  0.000  1.000
+```
+> see here, the translation in z is 0.3. (fixed frame)
+
+#### between bumperbot_base and odom
+```bash
+ros2 run tf2_ros tf2_echo bumperbot_base odom
+```
+```
+[INFO] [1768811007.124179519] [tf2_echo]: Waiting for transform bumperbot_base ->  odom: Invalid frame ID "bumperbot_base" passed to canTransform argument target_frame - frame does not exist
+At time 1768811008.7333502
+- Translation: [-1.480, 0.000, 0.000]
+- Rotation: in Quaternion (xyzw) [0.000, 0.000, 0.000, 1.000]
+- Rotation: in RPY (radian) [0.000, -0.000, 0.000]
+- Rotation: in RPY (degree) [0.000, -0.000, 0.000]
+- Matrix:
+  1.000  0.000  0.000 -1.480
+  0.000  1.000  0.000  0.000
+  0.000  0.000  1.000  0.000
+  0.000  0.000  0.000  1.000
+```
+> see here, the translation in x is -1.48. (moving frame since x is incremented every 0.1 seconds)
+
+
+
