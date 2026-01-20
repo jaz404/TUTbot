@@ -27,6 +27,7 @@ This repository contains the documentation, code, and resources for building and
 - [Visualization Setup](docs/setup_vis.md)
 - [ROS2 Control Setup](docs/ros2_control.md)
 - [Kinematics](docs/kinematics.md)
+- [Odometry](docs/odometry.md)
 
 ## Progress Table
 
@@ -38,9 +39,8 @@ This repository contains the documentation, code, and resources for building and
 | URDF & Visualization | Done |
 | Control | Done |
 | Kinematics | Done |
-| Odometry | |
-| Probability & Sensor Fusion| |
-| Add all the code | |
+| Odometry | Done |
+| Probability & Sensor Fusion | In Progress |
 
 ## Acknowledgements
 This project was created with help from Antonio Brandi's coursera course on ROS2. 
