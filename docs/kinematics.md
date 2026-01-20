@@ -551,6 +551,19 @@ The [joystick_teleop.yaml](../src/bumperbot_controller/config/joystick_teleop.ya
 
 The button and axis mapping can be found at https://github.com/Ar-Ray-code/ps_ros2_common. 
 
+### To run:
+#### Launch gazebo:
+```bash
+ros2 launch bumperbot_gazebo gazebo.launch.py
+```
+#### Launch simple controller:
+```bash
+ros2 launch bumperbot_controller simple_controller.launch.py
+```
+#### Launch joystick teleop:
+```bash
+ros2 launch bumperbot_controller joystick_teleop.launch.py
+```
 # TF2 
 In ROS 2, **TF2** is used to keep track of multiple coordinate frames over time and to transform data between them. Transformations can be classified as **static** or **dynamic** based on whether they change with time.
 
