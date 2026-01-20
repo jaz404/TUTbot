@@ -28,6 +28,7 @@ This repository contains the documentation, code, and resources for building and
 - [ROS2 Control Setup](docs/ros2_control.md)
 - [Kinematics](docs/kinematics.md)
 - [Odometry](docs/odometry.md)
+- [Sensor Fusion](docs/sensor_fusion.md)
 
 ## Progress Table
 
