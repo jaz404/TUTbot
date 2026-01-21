@@ -100,3 +100,197 @@ See the [gazebo.launch.py](../ros_test_ws/src/bumperbot_bringup/launch/gazebo.la
   <br>
   <em>Gazebo simulation of the robot with visualized joints.</em>
 </p>
+
+### How to simulate an imu sensor?  
+
+#### Create a new link `imu_link` in [bumperbot.urdf.xacro](../ros_test_ws/src/bumperbot_description/urdf/bumperbot.urdf.xacro) and add all the relevant tags.
+
+```xml
+<visual>
+    <link name="imu_link">
+        <inertial>
+        <origin />
+        <mass />
+        <inertia  />
+        </inertial>
+        <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <mesh filename="package://bumperbot_description/meshes/imu_link.STL" />
+        </geometry>
+        <material name="">
+            <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+        </material>
+        </visual>
+        <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <mesh filename="package://bumperbot_description/meshes/imu_link.STL" />
+        </geometry>
+        </collision>
+  </link>
+```
+#### Define the joint between imu_link and base_link
+```xml
+<joint name="imu_joint" type="fixed">
+  <origin xyz="0 0 0.0698986241758014" rpy="0 0 0" />
+  <parent link="base_link" />
+  <child link="imu_link" />
+  <axis xyz="0 0 0" />
+</joint>
+```
+#### To similate IMU in gazebo, add the following plugin in [bumperbot_gazebo.urdf.xacro](../src/bumperbot_description/urdf/bumperbot_gazebo.urdf.xacro)
+```xml
+</plugin>
+<plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+</plugin>
+```
+#### Next, we need to add the relevant properties of imu 
+This can be done in another gazebo tag in the same file. Set the reference to the name of the imu link. In this tag, we can adjust the uncertainities in each datafield of the imu sensor. Typically, the linear velocities have larger errors compared to the angular velocities. We can also adjust the name of topic it publishes at and the hz.
+```xml
+<gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <gz_frame_id>imu_link</gz_frame_id>
+        <topic>imu</topic>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+    </sensor>
+  </gazebo>
+```
+If we now launch gazebo, terminal should show that the imu has loaded:
+```bash
+[gazebo-2] [Dbg] [ImuSensor.cc:150] IMU data for [bumperbot::base_footprint::imu] advertised on [imu]
+```
+But the `/imu` topic cannot be accessed using ros2 topic list. This will require using the gazebo ros bridge. 
+
+#### Add the gazebo ros2 brdige node to [gazebo.launch.py](../src/bumperbot_description/launch/gazebo.launch.py)
+```xml
+gz_ros2_bridge = Node(
+    package="ros_gz_bridge",
+    executable="parameter_bridge",
+    arguments=[
+        "/imu@sensor_msgs/msg/Imu[gz.msg.IMU",
+        "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+    ],
+    remappings=[
+        ("/imu", "/imu/out")
+    ]
+)
+```
+This node enables communication between Gazebo Transport topics and ROS 2 topics.
+
+Bridged Topics:
+- /imu → sensor_msgs/msg/Imu (Gazebo → ROS 2)
+- /clock → rosgraph_msgs/msg/Clock (Gazebo → ROS 2)
+
+Remapping:
+- /imu is remapped to /imu/out for clearer separation of sensor output topics.
+
+On running ros2 list topic, should see `/imu/out` being published. 
+
+on echo:
+```
+header:
+  stamp:
+    sec: 73
+    nanosec: 780000000
+  frame_id: imu_link
+orientation:
+  x: 1.9589914616280593e-09
+  y: -0.0052737159047662905
+  z: 3.7158489066628803e-07
+  w: 0.9999860938635186
+orientation_covariance:
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+angular_velocity:
+  x: 9.887519563329777e-05
+  y: 0.00020248904024318398
+  z: 0.00012589436376863984
+angular_velocity_covariance:
+- 3.999999975690116e-08
+- 0.0
+- 0.0
+- 0.0
+- 3.999999975690116e-08
+- 0.0
+- 0.0
+- 0.0
+- 3.999999975690116e-08
+linear_acceleration:
+  x: 0.08772173886870498
+  y: 0.01244104920254562
+  z: 9.789098160543372
+linear_acceleration_covariance:
+- 0.00028899998869746923
+- 0.0
+- 0.0
+- 0.0
+- 0.00028899998869746923
+- 0.0
+- 0.0
+- 0.0
+- 0.00028899998869746923
+```
+info:
+```
+ros2 topic info /imu/out
+Type: sensor_msgs/msg/Imu
+Publisher count: 1
+Subscription count: 0
+```
+Launch gz, controller, joystick, plotjuggler
+<p align="center">
+<img src="assets/sim_imu.gif" />
+<br>
+Simulated imu data on Plotjuggler
+</p>

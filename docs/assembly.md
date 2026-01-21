@@ -12,7 +12,7 @@ The TUTbot is built using off-the-shelf components and 3D printed parts. The ide
 
 | Component | Quantity | Notes |
 |-----------|----------|-------|
-| Chassis plates (base, middle and top) | 1x each | 3D printed structural frame |
+| Chassis plates (base, middle and top) | 1x each | 3D printed structural frame (download [STL*](../src/bumperbot_description/meshes/))|
 | Geared Motor with Quadrature Encoder and Mounting Bracket | 2x | Main drive motors |
 | Wheels | 2x | Compatible with geared motors |
 | Raspberry pi 5 (with active cooling and case) | 1x | Main compute unit |
@@ -29,9 +29,11 @@ The TUTbot is built using off-the-shelf components and 3D printed parts. The ide
 
 <div align="center">
 <img src="assets/components_rotated.jpg" width="500px"/>
+<br>
+All the components required for the assembly
 </div>
 
-> the STL files for the chassis were sourced from AntoBrandi 
+*the STL files for the chassis were sourced from AntoBrandi 
 ## Assembly Process
 
 ### Base Assembly

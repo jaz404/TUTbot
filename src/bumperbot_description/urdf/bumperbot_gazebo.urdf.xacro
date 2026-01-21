@@ -50,6 +50,8 @@
       <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
         <parameters>$(find bumperbot_controller)/config/bumperbot_controllers.yaml</parameters>
       </plugin>
+      <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu">
+      </plugin>
     </xacro:if>
   </gazebo>
 
@@ -59,7 +61,87 @@
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find bumperbot_controller)/config/bumperbot_controllers.yaml</parameters>
       </plugin>
+      <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+      </plugin>
     </xacro:unless>
   </gazebo>
+  
+  <!-- This section defines an IMU sensor attached to imu_link in Gazebo -->
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+
+      <!-- Ensure the sensor is always active -->
+      <always_on>true</always_on>
+
+      <!-- Sensor update rate in Hz (100 measurements per second) -->
+      <update_rate>100</update_rate>
+
+      <!-- Frame ID used for publishing IMU data -->
+      <gz_frame_id>imu_link</gz_frame_id>
+
+      <!-- Gazebo topic on which IMU data is published -->
+      <topic>imu</topic>
+
+      <imu>
+        <!-- Gaussian noise applied independently to each gyro axis -->
+        <angular_velocity>
+
+          <x>
+            <noise type="gaussian">
+              <!-- Zero-mean white noise -->
+              <mean>0.0</mean>
+              <!-- Standard deviation based on IMU gyro noise characteristics -->
+              <stddev>2e-4</stddev>
+            </noise>
+          </x>
+
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </y>
+
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <!-- Angular velocity noise is smaller than linear acceleration
+                  (consistent with typical IMU datasheets) -->
+              <stddev>2e-4</stddev>
+            </noise>
+          </z>
+
+        </angular_velocity>
+        <!-- Higher noise compared to angular velocity, as expected for accelerometers -->
+        <linear_acceleration>
+
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <!-- Standard deviation reflects accelerometer noise -->
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </x>
+
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </y>
+
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </z>
+
+        </linear_acceleration>
+
+      </imu>
+    </sensor>
+  </gazebo>
+
 
 </robot>

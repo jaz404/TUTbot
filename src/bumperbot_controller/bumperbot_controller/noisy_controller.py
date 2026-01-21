@@ -80,8 +80,8 @@ class NoisyController(Node):
         # For more info about the formula used, check odometry.md
 
         ## adding gaussian noise
-        wheel_encoder_left = msg.position[1]
-        wheel_encoder_right = msg.position[0]
+        wheel_encoder_left = msg.position[0]
+        wheel_encoder_right = msg.position[1]
         
         # Add random gaussian noise to the wheel encoders
         wheel_encoder_left += np.random.normal(0, 0.005) # 0 mean and 0.005 std dev
@@ -97,12 +97,12 @@ class NoisyController(Node):
         if dt_s <= 0.0:
         # Nothing to integrate / differentiate yet; just update prevs and exit.
             self.prev_time_ = Time.from_msg(msg.header.stamp)
-            self.left_wheel_prev_pos_ = msg.position[1]
-            self.right_wheel_prev_pos_ = msg.position[0]
+            self.left_wheel_prev_pos_ = msg.position[0]
+            self.right_wheel_prev_pos_ = msg.position[1]
             return
 
-        self.left_wheel_prev_pos_ = msg.position[1]
-        self.right_wheel_prev_pos_ = msg.position[0]
+        self.left_wheel_prev_pos_ = msg.position[0]
+        self.right_wheel_prev_pos_ = msg.position[1]
         self.prev_time_ = Time.from_msg(msg.header.stamp)
 
         fi_left = dp_left/ (dt.nanoseconds / S_TO_NS)
