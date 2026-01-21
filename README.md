@@ -7,6 +7,8 @@
   <img src="docs/assets/ros2_control_test.gif" width="400" height="400"/>
   <img src="docs/assets/tf_odom_br_small.gif" height="400"/>
   <br/>
+  <img src="docs/assets/joint_pub.gif" width="800"/>
+  <br/>
   <em>TUTbot</em>
 </div>
 
@@ -89,7 +91,7 @@ Trajectory mapper node
 
 
 ## Acknowledgements
-This project was created with help from Antonio Brandi's coursera course on ROS2. 
+This project was created with help from Antonio Brandi's course on ROS2. 
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
