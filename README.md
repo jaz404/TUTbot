@@ -3,8 +3,9 @@
 <div align="center">
   <img src="docs/assets/assembled1.jpg" width="400" height="400"/>
   <img src="docs/assets/assembled2.jpg" width="400" height="400"/>
+  <br/>
   <img src="docs/assets/ros2_control_test.gif" width="400" height="400"/>
-  <img src="docs/assets/joint_origin_rotation.png" width="400" height="400"/>
+  <img src="docs/assets/tf_odom_br_small.gif" height="400"/>
   <br/>
   <em>TUTbot</em>
 </div>
