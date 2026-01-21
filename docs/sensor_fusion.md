@@ -182,3 +182,47 @@ Run gazebo, controller, joystick, plotjuggler, kalman_filter node
 ros2 run bumperbot_localization kalman_filter.py
 ```
 ## 3. EKF - Extended Kalman Filter
+Now, we can extend the functionality of the kalman filter to include the odometry and imu data. We can do this by using the robot_localization package.
+EKF provides a good estimation of the ground truth. 
+<p align="center">
+<img src="assets/ekf.gif" />
+<br>
+EKF
+</p>
+
+### Launch file
+#### Static transform publisher to publish the fixed frame transform from base_footprint_ekf to imu_link_ekf
+```python
+static_transform_publisher = Node(
+    package="tf2_ros",
+    executable="static_transform_publisher",
+    arguments=["--x","0","--y","0","--z","0.103","--qx","0","--qy","0","--qz","0","--qw","1",
+    "--frame-id","base_footprint_ekf","--child-frame-id","imu_link_ekf"]
+)
+```
+#### Robot localization node
+```python
+robot_localization = Node(
+    package="robot_localization",
+    executable="ekf_node",
+    name="ekf_filter_node",
+    output="screen",
+    parameters=[os.path.join(get_package_share_directory("bumperbot_localization"), "config", "ekf.yaml")]
+)
+```
+#### IMU republisher node
+```python
+imu_republisher_py = Node(
+    package="bumperbot_localization",
+    executable="imu_republisher.py",
+    condition=IfCondition(use_python)
+)
+```
+#### Configure [ekf.yaml](../ros_test_ws/src/bumperbot_localization/config/ekf.yaml)
+The robot_localization pkg requires a config file to define the sensors and their parameters.
+For more details look at the implementation of [ekf.yaml](../ros_test_ws/src/bumperbot_localization/config/ekf.yaml)
+
+#### To use robot_localization package, we must use the diff_driver instead of simple driver. 
+```bash
+ros2 launch bumperbot_controller controller.launch.py use_python:=false use_simple_controller:=false
+```

@@ -42,7 +42,51 @@ This repository contains the documentation, code, and resources for building and
 | Control | Done |
 | Kinematics | Done |
 | Odometry | Done |
-| Probability & Sensor Fusion | In Progress |
+| Probability & Sensor Fusion | Done |
+
+## Some Visuals
+
+### Noisy vs Clean odometry
+<p align="center">
+<img src="docs/assets/noisy_odom_2.gif" />
+<br>
+Noisy vs Clean odometry
+</p>
+
+### Monocular Kalman Filter
+<p align="center">
+<img src="docs/assets/odom_kalman.gif" />
+<br>
+Monocular Kalman Filter
+</p>
+
+### EKF based localization
+<p align="center">
+<img src="docs/assets/ekf.gif" />
+<br>
+EKF
+</p>
+
+### Teleoperation
+<p align="center">
+<img src="docs/assets/teleop_ps4.gif" />
+<br>
+Teleoperation with Joystick
+</p>
+
+<p align="center">
+<img src="docs/assets/control_teleop.gif" />
+<br>
+Teleoperation with Turtlesim
+</p>
+
+### Trajectory mapper node
+<p align="center">
+<img src="docs/assets/odometry_trajectory.png" width="800"/>
+<br>
+Trajectory mapper node
+</p>
+
 
 ## Acknowledgements
 This project was created with help from Antonio Brandi's coursera course on ROS2. 
