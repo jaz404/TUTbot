@@ -32,14 +32,15 @@ This repository contains the documentation, code, and resources for building and
 - [Kinematics](docs/kinematics.md)
 - [Odometry](docs/odometry.md)
 - [Sensor Fusion](docs/sensor_fusion.md)
+- [Arduino to ROS](docs/arduino_to_ros.md)
 
 ## Progress Table
 
 | Task | Status |
 |------|--------|
-| Robot Assembly | Done |
-| ROS setup | In Progress  |
-| Setup PID control for motors | |
+| Robot Assembly and Setup | Done |
+| ROS setup | Done  |
+| Setup PID control for motors | Done |
 | URDF & Visualization | Done |
 | Control | Done |
 | Kinematics | Done |

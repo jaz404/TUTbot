@@ -78,6 +78,115 @@ The top plate holds rplidar C1 and MPU6050 IMU. The rplidar C1 is mounted using 
 <img src="assets/assembled1.jpg" width="300px" />
 </div>
 
+## Setup Desktop
+### 1. [install ros2 jazzy and other dependancies](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)
+### 2. clone and build this repository
+
+## Setup Raspberry Pi 5
+
+### 1. [connecting via ssh](https://raspberrypi-guide.github.io/networking/connecting-via-ssh)
+
+### 2. [get the pi a static ip](https://www.ionos.com/digitalguide/server/configuration/provide-raspberry-pi-with-a-static-ip-address/)
+
+### 3. [install ros2 jazzy](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)
+
+### 4. Provide permissions to serial port
+```bash
+sudo usermod -a -G dialout $USER
+```
+
+### 5. Setup Bluetooth
+#### Open the bluetoothctl interface
+```bash
+bluetoothctl
+```
+Inside the bluetoothctl interface, turn on bluetooth:
+```bash
+power on
+```
+Inside the bluetoothctl interface, scan for devices
+```bash
+scan on
+```
+Press the ps and share button together on the ps4 controller for a few seconds (rapid white blinking light should turn on)
+The device should now appear in the list of available devices 
+Look for "wireless controller"
+```bash
+[bluetooth]# [NEW] Device 58:10:31:06:22:B9 Wireless Controller
+```
+And copy the device address (58:10:31:06:22:B9 in this case)
+
+#### Can exit bluetoothctl by typing `exit`
+
+#### Pair with device
+```bash
+bluetoothctl pair 58:10:31:06:22:B9
+Attempting to pair with 58:10:31:06:22:B9
+[CHG] Device 58:10:31:06:22:B9 Connected: yes
+[DEL] Device C8:38:32:31:67:5E Govee_H6076_675E
+[CHG] Device 58:10:31:06:22:B9 WakeAllowed: yes
+[CHG] Device 58:10:31:06:22:B9 ServicesResolved: yes
+[CHG] Device 58:10:31:06:22:B9 Paired: yes
+Pairing successful
+```
+#### Add to trusted devices
+```bash
+bluetoothctl trust 58:10:31:06:22:B9
+```
+This will allow the device to connect automatically
+
+#### Restart bluetooth service
+```bash
+sudo systemctl restart bluetooth
+```
+
+#### Connect to the device
+```bash
+$ bluetoothctl connect 58:10:31:06:22:B9
+Attempting to connect to 58:10:31:06:22:B9
+[CHG] Device 58:10:31:06:22:B9 Connected: yes
+[CHG] Device 58:10:31:06:22:B9 Paired: yes
+```
+Note: if connecting for the first time, even though you have paired, you still need to go to the pairing mode for a successful connection. Press the ps and share button together on the ps4 controller for a few seconds (rapid white blinking light should turn on)
+
+
+#### Setup auto connection on boot
+To avoid having to do all the above commands, we can modify the bluetooth configuration file:
+```bash
+sudo vim /etc/bluetooth/main.conf
+```
+Uncomment the following line
+```bash
+[General]
+FastConnectable=false
+```
+
+#### Create a new udev rule 
+A udev rule is a policy that tells Linux what to do when a device appears (USB, Bluetooth HID, serial, camera, joystick, CAN adapter, etc.).
+
+```bash
+cd /etc/udev/rules.d
+```
+80-89 are User/application rules
+```bash
+sudo touch 81-event.rules
+```
+```bash
+sudo vim 81-event.rules
+```
+Add the following line in the file:
+```bash
+SUBSYSTEM=="input", KERNEL=="event*", GROUP="raspberry", MODE="0660"
+```
+By default, input devices are owned by root and inaccessible to normal users.
+This rule allows non-root applications to read input events safely.
+
+### 6. Clone and build the repo 
+Build it using colcon and set the number of parallel workers to 2 due to low compute.
+```bash
+colcon build --parallel-workers 2
+```
+
 # RPLIDAR C1 Setup Guide
 
 This guide will walk you through setting up the RPLIDAR C1 sensor for the TUTbot robot.
@@ -119,8 +228,8 @@ Once the driver is running, open Rviz to visualize the LIDAR data
 
 I created a 30x30x10" enclosure to perform basic tests. The Lidar measured distances accurately within the expected range (~74cm).
 
-# Wemos D1 Mini Setup
-
+<!-- # Wemos D1 Mini Setup -->
+<!-- 
 <div align="center">
 <img src="assets/encoder_test.gif" width="300px"/>
-</div>
+</div> -->

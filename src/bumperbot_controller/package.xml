@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>bumperbot_localization</name>
+  <name>bumperbot_controller</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="jchhabr1@ualberta.ca">jaspr</maintainer>
