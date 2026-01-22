@@ -5,9 +5,7 @@
   <img src="docs/assets/assembled2.jpg" width="400" height="400"/>
   <br/>
   <img src="docs/assets/ros2_control_test.gif" width="400" height="400"/>
-  <img src="docs/assets/tf_odom_br_small.gif" height="400"/>
-  <br/>
-  <img src="docs/assets/joint_pub.gif" width="800"/>
+  <img src="docs/assets/joint_pub_crop.gif" width="400" height="400"/>
   <br/>
   <em>TUTbot</em>
 </div>
@@ -40,7 +38,7 @@ This repository contains the documentation, code, and resources for building and
 |------|--------|
 | Robot Assembly and Setup | Done |
 | ROS setup | Done  |
-| Setup PID control for motors | Done |
+| Setup PID control for motors | In Progress |
 | URDF & Visualization | Done |
 | Control | Done |
 | Kinematics | Done |
