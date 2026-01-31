@@ -101,6 +101,25 @@ See the [gazebo.launch.py](../ros_test_ws/src/bumperbot_bringup/launch/gazebo.la
   <em>Gazebo simulation of the robot with visualized joints.</em>
 </p>
 
+## Lets setup a Gazebo World 
+
+Create the following new directories in the bumperbot_description package:
+- `worlds/` - for Gazebo world files
+- `models/` - for custom Gazebo models
+- `photos/` - for photos of the world
+
+The models were sourced from [aws-robotics](https://github.com/aws-robotics/aws-robomaker-small-house-world)
+
+### TODO: add changes 
+
+<p align="center">
+  <img src="assets/small_house.gif" alt="Gazebo simulation of the robot" width="600">
+  <br>
+  <em>small house world.</em>
+</p>
+
+# Bringing sensors into Gazebo
+
 ### How to simulate an imu sensor?  
 
 #### Create a new link `imu_link` in [bumperbot.urdf.xacro](../ros_test_ws/src/bumperbot_description/urdf/bumperbot.urdf.xacro) and add all the relevant tags.
