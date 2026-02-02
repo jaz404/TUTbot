@@ -110,7 +110,7 @@ Create the following new directories in the bumperbot_description package:
 
 The models were sourced from [aws-robotics](https://github.com/aws-robotics/aws-robomaker-small-house-world)
 
-### TODO: add changes 
+### Loading small world in Gazebo
 
 <p align="center">
   <img src="assets/small_house.gif" alt="Gazebo simulation of the robot" width="600">
@@ -312,4 +312,12 @@ Launch gz, controller, joystick, plotjuggler
 <img src="assets/sim_imu.gif" />
 <br>
 Simulated imu data on Plotjuggler
+</p>
+
+### Similarly, we can simulate a 2D lidar 
+### TODO: add details 
+<p align="center">
+  <img src="assets/sim_laser.gif" alt="" width="400">
+  <br>
+  <em>laser scan sim</em>
 </p>
