@@ -81,6 +81,49 @@ This formulation captures the empirical observation that translation and rotatio
 
 By explicitly modeling this noise, the odometry motion model can be used in probabilistic localization frameworks such as particle filters, where samples are drawn from the motion distribution rather than applying a deterministic state update. This allows the localization system to represent and propagate uncertainty over time, rather than relying on a single drifting pose estimate.
 
+### 1.3. Speed and Separation Monitoring
+#### This requires setting up `twist_mux` package. For more details see [twist_relay.py](../src/bumperbot_controller/bumperbot_controller/twist_relay.py).
+This setup combines a twist relay node with twist_mux configuration files to manage multiple velocity command sources while enforcing safety and priority rules.
+
+The twist relay node bridges stamped and unstamped velocity messages. It converts controller outputs from Twist to TwistStamped so downstream nodes can rely on time-stamped commands, and converts joystick inputs from TwistStamped back to Twist for interfaces that expect unstamped messages. The node does not modify velocities; it only adapts message formats to keep the control pipeline consistent.
+
+The twist_mux joystick configuration defines how joystick commands are scaled and prioritized. The joystick_relay parameters enable priority handling and configure a turbo mode that sets minimum and maximum linear and angular velocities, along with discrete step levels. This limits and shapes joystick input so operator commands stay within safe, predefined speed ranges.
+
+The twist_mux lock configuration sets up a high-priority safety lock. When the safety_stop topic is published with true, this lock immediately overrides all other velocity sources (priority 255) with no timeout, effectively stopping the robot and preventing motion until the lock is released.
+
+
+A safety stop can be tested independently by publishing true to /safety_stop, which prevents the robot from moving when integrated with the safety logic.
+```bash
+ros2 topic pub /safety_stop std_msgs/msg/Bool "data: true"
+```
+If this topic is set to true, the robot will not move.
+
+The twist_mux topic configuration defines which velocity sources are allowed into the multiplexer and how they are arbitrated. Joystick and keyboard inputs are listed as separate topics, each with its own timeout and priority. Joystick commands are given higher priority than keyboard commands, and if a source stops publishing within its timeout window, it is automatically ignored. The use_stamped: false setting indicates that the mux operates on unstamped Twist messages.
+
+The twist_mux topic configuration defines which velocity sources are allowed into the multiplexer and how they are arbitrated. Joystick and keyboard inputs are listed as separate topics, each with its own timeout and priority. Joystick commands are given higher priority than keyboard commands, and if a source stops publishing within its timeout window, it is automatically ignored. The `use_stamped: false` setting indicates that the mux operates on unstamped `Twist` messages.
+
+Following this, a laser-based safety stop node is used to enforce speed and separation monitoring at runtime. This node continuously processes LiDAR data from the `LaserScan` topic and classifies the environment into three safety states: FREE, WARNING, and DANGER, based on configurable distance thresholds around the robot.
+
+If an obstacle is detected within the warning distance, the system enters a WARNING state and proactively reduces the robot’s speed by issuing a `JoyTurbo` decrease action, effectively scaling down joystick velocity commands without stopping the robot. If an obstacle is detected within the danger distance, the node immediately transitions to the DANGER state and publishes `safety_stop = true`, which activates the high-priority safety lock in `twist_mux` and brings the robot to a complete stop.
+
+When the surrounding area becomes clear again, the node returns to the FREE state, releases the safety stop, and restores normal operating speed by sending a `JoyTurbo` increase action. State changes are handled reactively, ensuring minimal latency between obstacle detection and control response.
+
+For visualization and debugging, the node publishes RViz markers representing the warning and danger zones as concentric cylinders around the robot. These zones change transparency depending on the active safety state, providing intuitive real-time feedback of the robot’s current safety envelope.
+
+Launch the simulated robot
+```bash
+ros2 launch bumperbot_bringup simulated_robot.launch.py world_name:=small_house
+```
+Launch the safety stop node
+```bash
+ros2 run bumperbot_utils safety_stop
+```
+<p align="center">
+<img src="assets/safety_stop.gif">
+<br>
+<em>Safety Stop in effect (robot stops right before collision)</em>
+</p>
+
 ## 2. Global Localization
 
 Global localization estimates the robot’s pose with respect to a known map and is responsible for correcting the drift accumulated by odometry. Rather than directly estimating `map → base_link`, it computes the transform between the `map` and `odom` frames, which indirectly places `base_link` in the global frame through the existing `odom → base_link` transform.

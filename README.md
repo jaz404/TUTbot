@@ -30,6 +30,7 @@ This repository contains the documentation, code, and resources for building and
 - [Kinematics](docs/kinematics.md)
 - [Odometry](docs/odometry.md)
 - [Sensor Fusion](docs/sensor_fusion.md)
+- [Mapping and Localization](docs/mapping_and_localization.md)
 - [Arduino to ROS](docs/arduino_to_ros.md)
 
 ## Progress Table
@@ -39,11 +40,14 @@ This repository contains the documentation, code, and resources for building and
 | Robot Assembly and Setup | Done |
 | ROS setup | Done  |
 | Setup PID control for motors | In Progress |
+| Teleoperation | Done |
 | URDF & Visualization | Done |
 | Control | Done |
 | Kinematics | Done |
 | Odometry | Done |
 | Probability & Sensor Fusion | Done |
+| Mapping and Localization | In Progress |
+| Navigation | In Progress |
 
 ## Some Visuals
 
