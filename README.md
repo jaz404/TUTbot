@@ -51,6 +51,13 @@ This repository contains the documentation, code, and resources for building and
 
 ## Some Visuals
 
+### Mapping with known poses
+<p align="center">
+<img src="docs/assets/mapping_with_known_poses.gif">
+<br>
+<em>Mapping with known poses</em>
+</p>
+
 ### Noisy vs Clean odometry
 <p align="center">
 <img src="docs/assets/noisy_odom_2.gif" />
@@ -72,6 +79,13 @@ Monocular Kalman Filter
 EKF
 </p>
 
+### Odometry Motion Model
+<p align="center">
+<img src="docs/assets/odom_model.gif">
+<br>
+<em>Odometry Motion Model with Uncertainty</em>
+</p>
+
 ### Teleoperation
 <p align="center">
 <img src="docs/assets/teleop_ps4.gif" />
@@ -83,6 +97,13 @@ Teleoperation with Joystick
 <img src="docs/assets/control_teleop.gif" />
 <br>
 Teleoperation with Turtlesim
+</p>
+
+### Marker visualization
+<p align="center">
+<img src="docs/assets/marker_vis.gif">
+<br>
+Marker visualization
 </p>
 
 ### Trajectory mapper node

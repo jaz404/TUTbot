@@ -133,6 +133,42 @@ We can also add markers to visualize the warning and danger zones in RViz.
 <em>Warning and danger zones in RViz</em>
 </p>
 
+### 1.4. Setup nav2_map_server (lifecycle node) 
+
+[global_localization.launch.py](../src/bumperbot_localization/launch/global_localization.launch.py) file for this has been implemented in the bumperbot_localization package. 
+
+Launch the map server
+```bash
+ros2 launch bumperbot_localization global_localization.launch.py map_name:=small_house
+```
+Ensure that the /map_server lifecycle node is in the active state. It should be since the launch file has nav2 lifecycle manager setup which initalizes the map server. 
+```bash
+ros2 lifecycle get /map_server
+active [3]
+```
+To be able to visualize the map, we still need to make sure that the QoS settings are correct. 
+
+In Rviz, we need to add a map layer and set the topic to `/map`. Set the topic /map reliability to transient local from volatile. The QoS settings should be compatible now and the map should appear in rviz. 
+
+To investigate such issues, we can use the ros2 topic info with flag --verbose to see the QoS settings of the topic. 
+```bash
+ros2 topic info --verbose /map
+```
+<p align="center">
+<img src="assets/occupancy_grid_map.png">
+<br>
+<em>Occupancy grid map</em>
+</p>
+
+## 1.5. Mapping with known poses 
+Implementation details in [mapping_with_known_poses.py](../src/bumperbot_mapping/bumperbot_mapping/mapping_with_known_poses.py)
+
+<p align="center">
+<img src="assets/mapping_with_known_poses.gif">
+<br>
+<em>Mapping with known poses</em>
+</p>
+
 ## 2. Global Localization
 
 Global localization estimates the robot’s pose with respect to a known map and is responsible for correcting the drift accumulated by odometry. Rather than directly estimating `map to base_link`, it computes the transform between the `map` and `odom` frames, which indirectly places `base_link` in the global frame through the existing `odom to base_link` transform.
