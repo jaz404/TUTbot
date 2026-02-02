@@ -82,6 +82,7 @@ This formulation captures the empirical observation that translation and rotatio
 By explicitly modeling this noise, the odometry motion model can be used in probabilistic localization frameworks such as particle filters, where samples are drawn from the motion distribution rather than applying a deterministic state update. This allows the localization system to represent and propagate uncertainty over time, rather than relying on a single drifting pose estimate.
 
 ### 1.3. Speed and Separation Monitoring
+
 #### This requires setting up `twist_mux` package. For more details see [twist_relay.py](../src/bumperbot_controller/bumperbot_controller/twist_relay.py).
 This setup combines a twist relay node with twist_mux configuration files to manage multiple velocity command sources while enforcing safety and priority rules.
 
@@ -98,7 +99,7 @@ ros2 topic pub /safety_stop std_msgs/msg/Bool "data: true"
 ```
 If this topic is set to true, the robot will not move.
 
-The twist_mux topic configuration defines which velocity sources are allowed into the multiplexer and how they are arbitrated. Joystick and keyboard inputs are listed as separate topics, each with its own timeout and priority. Joystick commands are given higher priority than keyboard commands, and if a source stops publishing within its timeout window, it is automatically ignored. The use_stamped: false setting indicates that the mux operates on unstamped Twist messages.
+#### [safety_stop.py](../src/bumperbot_utils/bumperbot_utils/safety_stop.py)
 
 The twist_mux topic configuration defines which velocity sources are allowed into the multiplexer and how they are arbitrated. Joystick and keyboard inputs are listed as separate topics, each with its own timeout and priority. Joystick commands are given higher priority than keyboard commands, and if a source stops publishing within its timeout window, it is automatically ignored. The `use_stamped: false` setting indicates that the mux operates on unstamped `Twist` messages.
 
@@ -124,9 +125,17 @@ ros2 run bumperbot_utils safety_stop
 <em>Safety Stop in effect (robot stops right before collision)</em>
 </p>
 
+We can also add markers to visualize the warning and danger zones in RViz. 
+
+<p align="center">
+<img src="assets/marker_vis.gif">
+<br>
+<em>Warning and danger zones in RViz</em>
+</p>
+
 ## 2. Global Localization
 
-Global localization estimates the robot’s pose with respect to a known map and is responsible for correcting the drift accumulated by odometry. Rather than directly estimating `map → base_link`, it computes the transform between the `map` and `odom` frames, which indirectly places `base_link` in the global frame through the existing `odom → base_link` transform.
+Global localization estimates the robot’s pose with respect to a known map and is responsible for correcting the drift accumulated by odometry. Rather than directly estimating `map to base_link`, it computes the transform between the `map` and `odom` frames, which indirectly places `base_link` in the global frame through the existing `odom to base_link` transform.
 
 Global localization assumes that local localization is already available and reasonably accurate in the short term. It uses exteroceptive sensors such as LiDAR or cameras to match current observations against the map, producing global pose corrections. These corrections may be non-smooth or discontinuous but ensure long-term consistency and enable reliable global navigation and planning.
 
