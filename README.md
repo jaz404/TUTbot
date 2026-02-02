@@ -58,25 +58,41 @@ This repository contains the documentation, code, and resources for building and
 <em>Mapping with known poses</em>
 </p>
 
+### AMCL (Adaptive Monte Carlo Localization)
+<p align="center">
+<img src="docs/assets/mapping_amcl.gif">
+<br>
+<em>Adaptive Monte Carlo Localization</em>
+</p>
+
+### SLAM (Simultaneous Localization and Mapping)
+When mapping and localization are performed together, the system is referred to as SLAM.
+
+<p align="center">
+<img src="docs/assets/mapping_slam.gif">
+<br>
+<em>factor graph based SLAM (from slam_toolbox)</em>
+</p>
+
 ### Noisy vs Clean odometry
 <p align="center">
 <img src="docs/assets/noisy_odom_2.gif" />
 <br>
-Noisy vs Clean odometry
+<em>Noisy vs Clean odometry</em>
 </p>
 
 ### Monocular Kalman Filter
 <p align="center">
 <img src="docs/assets/odom_kalman.gif" />
 <br>
-Monocular Kalman Filter
+<em>Monocular Kalman Filter</em>
 </p>
 
 ### EKF based localization
 <p align="center">
 <img src="docs/assets/ekf.gif" />
 <br>
-EKF
+<em>EKF based localization</em>
 </p>
 
 ### Odometry Motion Model
@@ -90,27 +106,27 @@ EKF
 <p align="center">
 <img src="docs/assets/teleop_ps4.gif" />
 <br>
-Teleoperation with Joystick
+<em>Teleoperation with Joystick</em>
 </p>
 
 <p align="center">
 <img src="docs/assets/control_teleop.gif" />
 <br>
-Teleoperation with Turtlesim
+<em>Teleoperation with Turtlesim</em>
 </p>
 
 ### Marker visualization
 <p align="center">
 <img src="docs/assets/marker_vis.gif">
 <br>
-Marker visualization
+<em>Marker visualization</em>
 </p>
 
 ### Trajectory mapper node
 <p align="center">
 <img src="docs/assets/odometry_trajectory.png" width="800"/>
 <br>
-Trajectory mapper node
+<em>Trajectory mapper node</em>
 </p>
 
 
