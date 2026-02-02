@@ -175,5 +175,18 @@ Global localization estimates the robot’s pose with respect to a known map and
 
 Global localization assumes that local localization is already available and reasonably accurate in the short term. It uses exteroceptive sensors such as LiDAR or cameras to match current observations against the map, producing global pose corrections. These corrections may be non-smooth or discontinuous but ensure long-term consistency and enable reliable global navigation and planning.
 
+### 2.1. Mapping with known map (AMCL)
+<p align="center">
+<img src="assets/mapping_amcl.gif">
+<br>
+<em>Adaptive Monte Carlo Localization</em>
+</p>
+
 ## 3. SLAM (Simultaneous Localization and Mapping)
 When mapping and localization are performed together, the system is referred to as SLAM.
+
+<p align="center">
+<img src="assets/mapping_slam.gif">
+<br>
+<em>factor graph based SLAM (from slam_toolbox)</em>
+</p>
