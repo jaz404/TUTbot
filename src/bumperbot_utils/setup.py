@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'simple_trajectory_plotter = bumperbot_utils.simple_trajectory_plotter:main',
+            'safety_stop = bumperbot_utils.safety_stop:main',
         ],
     },
 )
